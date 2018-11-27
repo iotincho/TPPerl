@@ -4,6 +4,12 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(secciones votos_por_seccion circuitos_por_secciones votos_por_circuito);
 
+sub trim {
+ my $string = shift;
+ $string =~ s/^\s+//;
+ $string =~ s/\s+$//;
+ return $string;
+}
 
 sub secciones{
   use LWP::Simple;
@@ -18,7 +24,7 @@ sub secciones{
   for my $line (split /\n/, $secciones_html){
       #print $line, "\n";
       if($line =~ /<OPTION value="(\d*)\|\d*">(.*)<\/OPTION>/g){ # toma los valores que se buscan 'Codigo' => 'localidad'
-       $secciones{$1} = $2;
+       $secciones{trim $1} = $2;
       }
   }
 #  for my $k(keys %localidades){
@@ -28,8 +34,6 @@ sub secciones{
 }
 
 sub circuitos_por_secciones{
-  use LWP::Simple;
-  use funciones;
   use LWP::Simple;
 
   my $html;
@@ -54,7 +58,7 @@ sub circuitos_por_secciones{
       $i =~ /["']([^|]*)|.*/g; #parseo de la linea. no se porque no puedo extraerlos a los dos juntos con $1 y $2
       my $i1= $1;
       $i=~ /;(.*)["']/;
-      $secciones{$k}{$i1} = $1 #agrego la entrada al hash agruapando por secciones, el valor del hash es el nombre del circuito.
+      $secciones{$k}{trim $i1} = $1 #agrego la entrada al hash agruapando por secciones, el valor del hash es el nombre del circuito.
     }
   }
 
